@@ -5,9 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Users.Queries
+namespace Application.Users.Queries;
+
+public class GetUserSummaryQuery: IRequest<GetUserSummaryQueryResponse>
 {
-    public class GetUserSummaryQuery: IRequest<GetUserSummaryQueryResponse>
-    {
-    }
 }

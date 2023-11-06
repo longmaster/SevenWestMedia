@@ -2,43 +2,39 @@ using Application.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SevenWestMedia.Controllers
+namespace SevenWestMedia.Controllers;
+
+[ApiController]
+[Route("api/users")]
+public class UsersController : ControllerBase
 {
-    [ApiController]
-    [Route("api/users")]
-    public class UsersController : ControllerBase
+    private readonly IMediator _mediator;
+
+    public UsersController(IMediator mediator) {
+        _mediator = mediator;
+    }
+
+    [HttpGet]
+    [Route("summary")]
+    public async  Task<ActionResult<GetUserSummaryQueryResponse>> GetData()           
     {
-        private readonly IMediator _mediator;
-   
+        GetUserSummaryQueryResponse? getUserSummaryQueryResponse = null;
 
-        public UsersController(IMediator mediator) {
-            _mediator = mediator;
-        }
-
-        [HttpGet]
-        [Route("summary")]
-        public async  Task<ActionResult<GetUserSummaryQueryResponse>> GetData()        
-               
-        
+        try 
         {
-            GetUserSummaryQueryResponse getUserSummaryQueryResponse = await _mediator.Send(new GetUserSummaryQuery());
+            getUserSummaryQueryResponse = await _mediator.Send(new GetUserSummaryQuery());
 
-            try 
-            { 
-                if(getUserSummaryQueryResponse == null) 
-                {
-                    return StatusCode(404);
-                }
-
-            }
-            catch (Exception ex) 
+            if (getUserSummaryQueryResponse == null) 
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(404);
             }
 
-            return Ok(getUserSummaryQueryResponse);
+        }
+        catch (Exception ex) 
+        {
+            return StatusCode(500, ex.Message);
         }
 
- 
+        return Ok(getUserSummaryQueryResponse);
     }
 }

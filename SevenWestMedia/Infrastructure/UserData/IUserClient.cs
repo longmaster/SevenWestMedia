@@ -2,10 +2,9 @@
 
 using Domain;
 
-namespace Infrastructure.UserData
+namespace Infrastructure.UserData;
+
+public interface IUserClient<T>
 {
-    public interface IUserClient
-    {
-        Task<IEnumerable<User>> GetDataAsync();
-    }
+    Task<IEnumerable<T>> GetDataAsync();
 }

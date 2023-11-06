@@ -8,19 +8,17 @@ using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema.Generation;
 
-namespace Common.Helpers
+namespace Common.Helpers;
+
+public static class JsonHelper
 {
-    public static class JsonHelper
+    public static bool Validate<T>(string jsonString)
     {
-        public static bool Validate<T>(string jsonString)
-        {
-            JSchemaGenerator generator = new JSchemaGenerator();
-            JSchema schema = generator.Generate(typeof(T));
+        JSchemaGenerator generator = new JSchemaGenerator();
+        JSchema schema = generator.Generate(typeof(T));
 
-            JArray jarray = JArray.Parse(jsonString);
+        JArray jarray = JArray.Parse(jsonString);
 
-       
-            return jarray.IsValid(schema);
-        }
+        return jarray.IsValid(schema);
     }
 }

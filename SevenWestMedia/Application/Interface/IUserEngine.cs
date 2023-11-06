@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interface
+namespace Application.Interface;
+
+public interface IUserEngine
 {
-    public interface IUserEngine
-    {
-        Task<IEnumerable<User>> GetUsersAsync();
-    }
+    Task<IEnumerable<User>> GetUsersAsync();
 }

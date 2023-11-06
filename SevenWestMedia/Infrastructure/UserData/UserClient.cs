@@ -15,76 +15,60 @@ using Newtonsoft.Json.Schema.Generation;
 using System.Security.Principal;
 using Newtonsoft.Json;
 
-namespace Infrastructure.UserData
+namespace Infrastructure.UserData;
+
+public class UserClient<T> : IUserClient<T> where T : class
 {
-    public class UserClient : IUserClient
+    private readonly IFlurlClient _flurlClient;
+    private readonly ILogger<UserClient<T>> _logger;
+    private readonly IOptions<EndPointConfig> _endPointConfig;
+
+    public UserClient(IFlurlClientFactory flurlClientFactory,
+                        ILogger<UserClient<T>> logger,
+                        IOptions<EndPointConfig> endPointConfig) 
     {
-        private readonly IFlurlClient _flurlClient;
-        private readonly ILogger<UserClient> _logger;
-        private readonly IOptions<EndPointConfig> _endPointConfig;
-
-        public UserClient(IFlurlClientFactory flurlClientFactory,
-                            ILogger<UserClient> logger,
-                            IOptions<EndPointConfig> endPointConfig) 
+        _logger = logger;
+        _endPointConfig = endPointConfig;
+        _flurlClient = flurlClientFactory.Get(_endPointConfig.Value.UserApiEndPoint);
+    }
+    public async Task<IEnumerable<T>> GetDataAsync()
+    {
+        try
         {
-            _logger = logger;
-            _endPointConfig = endPointConfig;
-            _flurlClient = flurlClientFactory.Get(_endPointConfig.Value.UserApiEndPoint);
-        }
-        public async Task<IEnumerable<User>> GetDataAsync()
-        {
-            try
+            IFlurlResponse flurlResponse = await _flurlClient.Request().AllowAnyHttpStatus().GetAsync();
+
+            string responseBody = await flurlResponse.ResponseMessage.Content.ReadAsStringAsync();
+         
+            if(string.IsNullOrEmpty(responseBody)) return Enumerable.Empty<T>();
+
+            bool validationResult = JsonHelper.Validate<T[]>(responseBody);
+
+            if (validationResult)
             {
-                IFlurlResponse flurlResponse = await _flurlClient.Request().AllowAnyHttpStatus().GetAsync();
+                IEnumerable<T> users = await flurlResponse.GetJsonAsync<IEnumerable<T>>();
 
-                string responseBody = await flurlResponse.ResponseMessage.Content.ReadAsStringAsync();
-             
-                bool validationResult = JsonHelper.Validate<User[]>(responseBody);
-
-                if (validationResult)
-                {
-                    IEnumerable<User> userStream = await flurlResponse.GetJsonAsync<IEnumerable<User>>();
-
-                    return userStream;
-                }
-                else
-                {
-
-                    _logger.LogError($"Invalid Json");
-
-                    return Enumerable.Empty<User>();
-                }
-
+                return users;
             }
-
-            catch (JSchemaReaderException ex)
-            {
-                _logger.LogError($"{ex.Message}");
-
-                return Enumerable.Empty<User>();
-            }
-            catch (JsonReaderException ex)
-            {
-                _logger.LogError($"{ex.Message}");
-
-                return Enumerable.Empty<User>();
-            }
-            catch (FlurlHttpException ex)
+            else
             {
 
+                _logger.LogError($"Invalid Json");
 
-                _logger.LogError($"{ex.Message}");
-                return Enumerable.Empty<User>();
-
-            }
-            catch (Exception ex)
-            {
-
-                _logger.LogError($"{ex.Message}");
-
-                throw;
+                return Enumerable.Empty<T>();
             }
 
         }
+        catch (Exception ex) when (   ex is JSchemaReaderException 
+                                   || ex is JsonReaderException
+                                   || ex is FlurlHttpException
+                                   )
+        {
+
+            _logger.LogError($"{ex.Message}");
+
+            return Enumerable.Empty<T>();
+ 
+        }
+
     }
 }

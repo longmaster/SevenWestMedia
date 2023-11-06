@@ -4,25 +4,28 @@ using Microsoft.Extensions.DependencyInjection;
 using Common;
 using Application.Interface;
 using Infrastructure.Caching;
+using Flurl.Http;
+using Infrastructure.Policy;
 
-namespace Infrastructure
+namespace Infrastructure;
+
+public static class ConfigureServices
 {
-    public static class ConfigureServices
+    public static IServiceCollection AddInsfrastructure(this IServiceCollection services)
     {
-        public static IServiceCollection AddInsfrastructure(this IServiceCollection services)
+        if (services == null)
         {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
-            services.AddTransient<IUserClient, UserClient>();
-            services.AddTransient<IUserEngine, UserEngine>();
-
-
-            services.AddScoped<ICacheManager, CachingManager>();
-            return services;
+            throw new ArgumentNullException(nameof(services));
         }
+
+        services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
+        services.AddTransient(typeof(IUserClient<>), typeof(UserClient<>));
+        services.AddTransient<IUserEngine, UserEngine>();
+        services.AddScoped<ICacheManager, CachingManager>();
+
+        // Polly - Retry & Timeout policies configuration
+        FlurlHttp.Configure(settings => settings.HttpClientFactory = new CustomPollyHttpClientFactory());
+
+        return services;
     }
 }
