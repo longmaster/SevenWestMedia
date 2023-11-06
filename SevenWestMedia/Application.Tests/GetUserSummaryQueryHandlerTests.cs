@@ -1,8 +1,12 @@
+using System.Reflection.Emit;
 using Application.Interface;
 using Application.Users.Queries;
+using Castle.Core.Logging;
 using Domain;
 using Microsoft.Extensions.Logging;
+using Moq;
 using SevenWestMedia.Test.Data;
+
 
 namespace Application.Tests;
 
@@ -30,11 +34,11 @@ public class GetUserSummaryQueryHandlerTests
         // Act
 
         GetUserSummaryQueryHandler getUserSummaryQueryHandler = new GetUserSummaryQueryHandler(
-            _mockLogger.Object, 
-            _mockUserEngine.Object, 
+            _mockLogger.Object,
+            _mockUserEngine.Object,
             _mockCacheManager.Object);
 
-        GetUserSummaryQueryResponse response = await getUserSummaryQueryHandler.Handle(new GetUserSummaryQuery(), 
+        GetUserSummaryQueryResponse response = await getUserSummaryQueryHandler.Handle(new GetUserSummaryQuery(),
             CancellationToken.None);
 
         // Assert
@@ -52,7 +56,7 @@ public class GetUserSummaryQueryHandlerTests
         _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(new List<User>());
         _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers());
         _mockCacheManager.Setup(x => x.SetCollectionAsync<User>(It.IsAny<IEnumerable<User>>(), It.IsAny<TimeSpan>(),
-            It.IsAny <int>()))
+            It.IsAny<int>()))
             .ReturnsAsync(UserFactory.CreateListUsers());
 
         // Act
@@ -98,5 +102,38 @@ public class GetUserSummaryQueryHandlerTests
         Assert.Equal(string.Empty, response.FirstName);
         Assert.Empty(response.UserFullName);
         Assert.Empty(response.GenderPerAges);
+    }
+
+    [Fact]
+    public async Task GetUserSummaryQueryHandler_ThrowException_ReturnValidResponse()
+    {
+        // Assign
+
+        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(new List<User>());
+        _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers());
+        _mockCacheManager.Setup(x => x.SetCollectionAsync<User>(It.IsAny<IEnumerable<User>>(), It.IsAny<TimeSpan>(),
+            It.IsAny<int>()))
+            .Throws(new SystemException());
+
+        // Act
+
+        GetUserSummaryQueryHandler getUserSummaryQueryHandler = new GetUserSummaryQueryHandler(
+            _mockLogger.Object,
+            _mockUserEngine.Object,
+            _mockCacheManager.Object);
+
+        GetUserSummaryQueryResponse response = await getUserSummaryQueryHandler.Handle(new GetUserSummaryQuery(),
+            CancellationToken.None);
+
+        // Assert
+
+
+        _mockLogger.Verify(logger => logger.Log(
+        It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
+        It.Is<EventId>(eventId => eventId.Id == 0),
+        It.Is<It.IsAnyType>((@object, @type) => @object.ToString() == "System error."),
+        It.IsAny<Exception>(),
+        It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+    Times.Once);
     }
 }

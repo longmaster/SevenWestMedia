@@ -49,10 +49,10 @@ public class CachingManager : ICacheManager
     public async Task<IEnumerable<T>> SetCollectionAsync<T>(IEnumerable<T> value, TimeSpan cacheTime, int chunkSize) where T : notnull
     {
 
-        IRedisCollection<T> users = _redisConnectionProvider.RedisCollection<T>(chunkSize);
-
         try
         {
+
+            IRedisCollection<T> users = _redisConnectionProvider.RedisCollection<T>(chunkSize);
             if (!users.Any())
             {
                 _redisConnectionProvider.Connection.DropIndexAndAssociatedRecords(typeof(T));
@@ -67,6 +67,7 @@ public class CachingManager : ICacheManager
                 return value;
             }
 
+            return users;
         }
         catch (RedisConnectionException ex)
         {
@@ -80,7 +81,6 @@ public class CachingManager : ICacheManager
 
             return value;
         }
-        return users;
     }
 
 }

@@ -23,20 +23,29 @@ public class GetUserSummaryQueryHandler : IRequestHandler<GetUserSummaryQuery, G
     public async Task<GetUserSummaryQueryResponse> Handle(GetUserSummaryQuery request, CancellationToken cancellationToken)
 
     {
-        IEnumerable<User> users = _cacheManager.GetCollectionAsync<User>();
-
-        if (!users.Any())
+        GetUserSummaryQueryResponse getUserSummaryQueryResponse = null;
+        try
         {
-            IEnumerable<User> usersDb = await _userEngine.GetUsersAsync();
-            if (usersDb.Any())
+            IEnumerable<User> users = _cacheManager.GetCollectionAsync<User>();
+
+            if (!users.Any())
             {
-                users = await _cacheManager.SetCollectionAsync(usersDb, new TimeSpan(0, 30, 0));
+                IEnumerable<User> usersDb = await _userEngine.GetUsersAsync();
+                if (usersDb.Any())
+                {
+                    users = await _cacheManager.SetCollectionAsync(usersDb, new TimeSpan(0, 30, 0));
+                }
             }
+
+            if (!users.Any()) return new GetUserSummaryQueryResponse();
+
+            getUserSummaryQueryResponse = _setGetUserSummaryQueryResponse(users);
         }
+        catch (Exception ex) 
+        {
+            _logger.LogError(ex.Message);
 
-        if (!users.Any()) return new GetUserSummaryQueryResponse();
-
-        GetUserSummaryQueryResponse getUserSummaryQueryResponse = _setGetUserSummaryQueryResponse(users);
+        }
 
         return getUserSummaryQueryResponse;
     }
