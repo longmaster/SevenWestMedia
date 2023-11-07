@@ -13,19 +13,19 @@ public class User
 
     [Indexed]
     [JsonProperty("first")]
-    public string First { get; set; }
+    public string? First { get; set; }
 
     [Indexed]
     [JsonProperty("last")]
-    public string Last { get; set; }
+    public string? Last { get; set; }
 
     [Indexed(Sortable = true)]
     [JsonProperty("age")]
-    public int Age { get; set; }
+    public int? Age { get; set; }
 
     [Indexed(Sortable = true)]
     [JsonProperty("gender")]
-    public string Gender { get; set; }
+    public string? Gender { get; set; }
 }
 
 

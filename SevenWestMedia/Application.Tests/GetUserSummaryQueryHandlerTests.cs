@@ -1,12 +1,7 @@
-using System.Reflection.Emit;
 using Application.Interface;
 using Application.Users.Queries;
-using Castle.Core.Logging;
 using Domain;
 using Microsoft.Extensions.Logging;
-using Moq;
-using SevenWestMedia.Test.Data;
-
 
 namespace Application.Tests;
 
@@ -28,8 +23,9 @@ public class GetUserSummaryQueryHandlerTests
     {
         // Assign
 
-        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(UserFactory.CreateListUsers());
-        _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers());
+        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(UserFactory.CreateListUsers);
+
+        _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers);
 
         // Act
 
@@ -54,10 +50,10 @@ public class GetUserSummaryQueryHandlerTests
         // Assign
 
         _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(new List<User>());
-        _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers());
+        _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers);
         _mockCacheManager.Setup(x => x.SetCollectionAsync<User>(It.IsAny<IEnumerable<User>>(), It.IsAny<TimeSpan>(),
             It.IsAny<int>()))
-            .ReturnsAsync(UserFactory.CreateListUsers());
+            .ReturnsAsync(UserFactory.CreateListUsers);
 
         // Act
 
@@ -110,7 +106,7 @@ public class GetUserSummaryQueryHandlerTests
         // Assign
 
         _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(new List<User>());
-        _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers());
+        _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers);
         _mockCacheManager.Setup(x => x.SetCollectionAsync<User>(It.IsAny<IEnumerable<User>>(), It.IsAny<TimeSpan>(),
             It.IsAny<int>()))
             .Throws(new SystemException());
@@ -127,13 +123,6 @@ public class GetUserSummaryQueryHandlerTests
 
         // Assert
 
-
-        _mockLogger.Verify(logger => logger.Log(
-        It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
-        It.Is<EventId>(eventId => eventId.Id == 0),
-        It.Is<It.IsAnyType>((@object, @type) => @object.ToString() == "System error."),
-        It.IsAny<Exception>(),
-        It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-    Times.Once);
+        _mockLogger.VerifyLog(LogLevel.Error, "System error.", Times.Once);
     }
 }

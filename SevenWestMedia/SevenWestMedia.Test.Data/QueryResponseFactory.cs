@@ -24,4 +24,8 @@ public static class QueryResponseFactory
                 {
                      Age = 20, Female = 1, Male = 1,
                 } };
+
+    public static string UserJsonData => @"{ ""id"": 53, ""first"": ""Bill"", ""last"": ""Bryson"", ""age"":23, ""gender"":""M"" }";
+
+ 
 }

@@ -21,9 +21,8 @@ public class GetUserSummaryQueryHandler : IRequestHandler<GetUserSummaryQuery, G
         _cacheManager = cacheManager;
     }
     public async Task<GetUserSummaryQueryResponse> Handle(GetUserSummaryQuery request, CancellationToken cancellationToken)
-
     {
-        GetUserSummaryQueryResponse getUserSummaryQueryResponse = null;
+        GetUserSummaryQueryResponse? getUserSummaryQueryResponse = null;
         try
         {
             IEnumerable<User> users = _cacheManager.GetCollectionAsync<User>();
@@ -35,22 +34,25 @@ public class GetUserSummaryQueryHandler : IRequestHandler<GetUserSummaryQuery, G
                 {
                     users = await _cacheManager.SetCollectionAsync(usersDb, new TimeSpan(0, 30, 0));
                 }
+                else 
+                {
+                    return new GetUserSummaryQueryResponse();
+                }
             }
 
-            if (!users.Any()) return new GetUserSummaryQueryResponse();
-
-            getUserSummaryQueryResponse = _setGetUserSummaryQueryResponse(users);
+            getUserSummaryQueryResponse = _setGetUserSummaryQueryResponse(users.ToHashSet());
         }
         catch (Exception ex) 
         {
             _logger.LogError(ex.Message);
 
+            return new GetUserSummaryQueryResponse();
         }
 
         return getUserSummaryQueryResponse;
     }
 
-    private GetUserSummaryQueryResponse _setGetUserSummaryQueryResponse(IEnumerable<User> users)
+    private GetUserSummaryQueryResponse _setGetUserSummaryQueryResponse(HashSet<User> users)
     {
         return new GetUserSummaryQueryResponse()
         {
@@ -65,7 +67,7 @@ public class GetUserSummaryQueryHandler : IRequestHandler<GetUserSummaryQuery, G
 
             GenderPerAges = users.GroupBy(x => new { x.Age }).Select(x => new GenderPerAge
             {
-                Age = x.Key.Age,
+                Age = x.Key.Age ?? 0,
                 Male = x.Where(g => g.Age == x.Key.Age && g.Gender == "M").Count(),
                 Female = x.Where(g => g.Age == x.Key.Age && g.Gender == "Y").Count()
             }).OrderBy(user => user.Age).ToList()

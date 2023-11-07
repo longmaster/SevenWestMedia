@@ -1,10 +1,9 @@
-using System.Linq;
 using Application.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SevenWestMedia.Controllers;
-using SevenWestMedia.Test.Data;
+
 
 namespace SevenWestMedia.Api.Tests;
 
@@ -64,7 +63,6 @@ public class UsersControllerTests
     {
         // Assign
 
-        GetUserSummaryQueryResponse? GetUserSummaryQueryResponse = null;
         _mockMediator.Setup(x => x.Send(It.IsAny<GetUserSummaryQuery>(), CancellationToken.None))
                         .Throws(new SystemException());
 
@@ -104,7 +102,7 @@ public class UsersControllerTests
 
     }
 
-    private void _setupMockMediator(GetUserSummaryQueryResponse getUserSummaryQueryResponse)
+    private void _setupMockMediator(GetUserSummaryQueryResponse? getUserSummaryQueryResponse)
     {
         _mockMediator.Setup(x => x.Send(It.IsAny<GetUserSummaryQuery>(), CancellationToken.None))
                             .ReturnsAsync(getUserSummaryQueryResponse);
