@@ -7,7 +7,7 @@ Please run SevenWestMedia.Api on  http://localhost:5000/api/users/summary. Then 
 
 Due to time constraint unit tests are in complete
 
-I REALY APPREIATE you send feedback to my email ngokhanhlong@gmail.com . Your feedback is invaluable to me
+your feedback is highly appreciated. you can send feedback to my email ngokhanhlong@gmail.com . Your feedback is invaluable to me
 
 Thank You for reviewing the code.
 
