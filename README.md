@@ -1,7 +1,7 @@
 # SevenWestMedia
 
 ## Techs
-Clean Architecture, Mediator, Redis
+Clean Architecture, Mediator, Redis, CQRS
 
 Please run SevenWestMedia.Api on  http://localhost:5000/api/users/summary. Then please run console app to consume API and return data
 
