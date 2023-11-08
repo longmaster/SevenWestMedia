@@ -25,7 +25,7 @@ public class GetUserSummaryQueryHandler : IRequestHandler<GetUserSummaryQuery, G
         GetUserSummaryQueryResponse? getUserSummaryQueryResponse = null;
         try
         {
-            IEnumerable<User> users = _cacheManager.GetCollectionAsync<User>();
+            IEnumerable<User> users = await _cacheManager.GetCollectionAsync<User>();
 
             if (!users.Any())
             {

@@ -35,7 +35,7 @@ public class CachingManagerTests
         CachingManager cachingManager = new CachingManager(_mockRedisConnectionProvider.Object, _mockLogger.Object);
 
         // Assert
-        List<User> users = cachingManager.GetCollectionAsync<User>(10000).ToList();
+        List<User> users = cachingManager.GetCollectionAsync<User>(10000).Result.ToList();
         Assert.Equal(6, users.Count());
     }
 
@@ -50,7 +50,7 @@ public class CachingManagerTests
         CachingManager cachingManager = new CachingManager(_mockRedisConnectionProvider.Object, _mockLogger.Object);
 
         // Assert
-        List<User> users = cachingManager.GetCollectionAsync<User>(10000).ToList();
+        List<User> users = cachingManager.GetCollectionAsync<User>(10000).Result.ToList();
         Assert.Empty(users);
     }
     [Fact]
@@ -62,7 +62,7 @@ public class CachingManagerTests
         CachingManager cachingManager = new CachingManager(_mockRedisConnectionProvider.Object, _mockLogger.Object);
 
         // Assert
-        List<User> users = cachingManager.GetCollectionAsync<User>(10000).ToList();
+        List<User> users = cachingManager.GetCollectionAsync<User>(10000).Result.ToList();
 
         _mockLogger.VerifyLog(LogLevel.Error, Times.Once);
         Assert.Empty(users);

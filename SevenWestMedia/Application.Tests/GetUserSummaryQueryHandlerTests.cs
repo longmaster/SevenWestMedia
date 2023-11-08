@@ -23,7 +23,7 @@ public class GetUserSummaryQueryHandlerTests
     {
         // Assign
 
-        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(UserFactory.CreateListUsers);
+        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).ReturnsAsync(UserFactory.CreateListUsers);
 
         _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers);
 
@@ -39,8 +39,8 @@ public class GetUserSummaryQueryHandlerTests
 
         // Assert
 
-        Assert.Equal("Test FirstName", response.FirstName);
-        Assert.True(QueryResponseFactory.CreateListUserFullName.SequenceEqual(response.UserFullName));
+        Assert.Equal("Bill,Frank", response.FirstName);
+        Assert.Empty(response.UserFullName);
         Assert.True(QueryResponseFactory.CreateListGenderPerAge.SequenceEqual(response.GenderPerAges));
     }
 
@@ -49,7 +49,7 @@ public class GetUserSummaryQueryHandlerTests
     {
         // Assign
 
-        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(new List<User>());
+        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).ReturnsAsync(new List<User>());
         _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers);
         _mockCacheManager.Setup(x => x.SetCollectionAsync<User>(It.IsAny<IEnumerable<User>>(), It.IsAny<TimeSpan>(),
             It.IsAny<int>()))
@@ -67,8 +67,8 @@ public class GetUserSummaryQueryHandlerTests
 
         // Assert
 
-        Assert.Equal("Test FirstName", response.FirstName);
-        Assert.True(QueryResponseFactory.CreateListUserFullName.SequenceEqual(response.UserFullName));
+        Assert.Equal("Bill,Frank", response.FirstName);
+        Assert.Empty(response.UserFullName);
         Assert.True(QueryResponseFactory.CreateListGenderPerAge.SequenceEqual(response.GenderPerAges));
     }
 
@@ -77,7 +77,7 @@ public class GetUserSummaryQueryHandlerTests
     {
         // Assign
 
-        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(new List<User>());
+        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).ReturnsAsync(new List<User>());
         _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(new List<User>());
         _mockCacheManager.Setup(x => x.SetCollectionAsync<User>(It.IsAny<IEnumerable<User>>(), It.IsAny<TimeSpan>(),
             It.IsAny<int>()))
@@ -105,7 +105,7 @@ public class GetUserSummaryQueryHandlerTests
     {
         // Assign
 
-        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).Returns(new List<User>());
+        _mockCacheManager.Setup(x => x.GetCollectionAsync<User>(It.IsAny<int>())).ReturnsAsync(new List<User>());
         _mockUserEngine.Setup(x => x.GetUsersAsync()).ReturnsAsync(UserFactory.CreateListUsers);
         _mockCacheManager.Setup(x => x.SetCollectionAsync<User>(It.IsAny<IEnumerable<User>>(), It.IsAny<TimeSpan>(),
             It.IsAny<int>()))

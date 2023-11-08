@@ -18,12 +18,25 @@ public static class QueryResponseFactory
         };
     }
 
-    public static List<string> CreateListUserFullName => new List<string>() { "Bill", "Adam", "Peter" };
+    public static List<string> CreateListUserFullName => new List<string>() { "Bill", "Bryson", "John", "Frank", "Frank", "Anna" };
 
-    public static List<GenderPerAge> CreateListGenderPerAge => new List<GenderPerAge>() { new GenderPerAge()
+
+    public static List<GenderPerAge> CreateListGenderPerAge => new List<GenderPerAge>() {
+
+           new GenderPerAge()
                 {
-                     Age = 20, Female = 1, Male = 1,
-                } };
+                     Age = 23, Female = 0, Male = 1,
+
+                } ,
+        new GenderPerAge()
+                {
+                     Age = 54, Female = 0, Male = 1,
+                      
+                } ,
+        new GenderPerAge {
+         Age = 66, Female = 2, Male = 0,
+        }
+    };
 
     public static string UserJsonData => @"{ ""id"": 53, ""first"": ""Bill"", ""last"": ""Bryson"", ""age"":23, ""gender"":""M"" }";
 

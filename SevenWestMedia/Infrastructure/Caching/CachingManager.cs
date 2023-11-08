@@ -22,11 +22,12 @@ public class CachingManager : ICacheManager
         _logger = logger;
 
     }
-    public  IEnumerable<T> GetCollectionAsync<T>(int chunkSize) where T : notnull
+    public async Task<IEnumerable<T>> GetCollectionAsync<T>(int chunkSize) where T : notnull
     {
         try
         {
-            IRedisCollection<T> redisCollection = _redisConnectionProvider.RedisCollection<T>(chunkSize);
+            var taskRedis = Task.Run(()=> _redisConnectionProvider.RedisCollection<T>(chunkSize));
+            IRedisCollection<T> redisCollection = await taskRedis;
 
             if(!redisCollection.Any())
                 return Enumerable.Empty<T>();
